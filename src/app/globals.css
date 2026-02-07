@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fff0f5;
+  --foreground: #881337;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  /* Remove tap highlight on mobile */
+  touch-action: manipulation;
+  /* Improve touch responsiveness */
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-romantic {
+  font-family: var(--font-pacifico), cursive;
+}
+
+/* Mobile-optimized floating hearts animation */
+@keyframes float {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-float {
+  animation: float 15s linear infinite;
+}
+
+/* Touch-friendly button styles */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/* Smooth scrolling for mobile */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent text size adjustment on mobile */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Better tap targets for mobile */
+button,
+a {
+  min-height: 44px;
+  /* iOS recommended touch target */
+  min-width: 44px;
+}
+
+/* Optimize animations for mobile performance */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
