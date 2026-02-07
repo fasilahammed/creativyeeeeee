@@ -11,11 +11,20 @@ export default function YesPage() {
     const [uploadedImages, setUploadedImages] = useState<{ [key: string]: string }>({});
 
     useEffect(() => {
-        // Load images from localStorage
-        const stored = localStorage.getItem('valentineImages');
-        if (stored) {
-            setUploadedImages(JSON.parse(stored));
-        }
+        // Load images from db.json via API
+        const loadPhotos = async () => {
+            try {
+                const response = await fetch('/api/photos');
+                const data = await response.json();
+                if (data.photos) {
+                    setUploadedImages(data.photos);
+                }
+            } catch (error) {
+                console.error('Failed to load photos:', error);
+            }
+        };
+
+        loadPhotos();
 
         // Launch fireworks
         const duration = 15 * 1000;
@@ -86,7 +95,7 @@ export default function YesPage() {
                         animate={{ opacity: 1 }}
                         transition={{ duration: 1 }}
                     >
-                        {/* Photo Grid - Desktop & Mobile Optimized */}
+                        {/* Photo Grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8 mb-12 sm:mb-16 max-w-5xl mx-auto">
                             {photos.map((photo, index) => {
                                 const hasImage = uploadedImages[photo.key];
@@ -127,7 +136,7 @@ export default function YesPage() {
                             })}
                         </div>
 
-                        {/* Love Letter - Mobile & Desktop */}
+                        {/* Love Letter */}
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}

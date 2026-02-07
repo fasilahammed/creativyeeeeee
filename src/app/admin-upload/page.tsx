@@ -1,61 +1,90 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Check, X, Lock } from 'lucide-react';
+import { Upload, Check, Lock, AlertCircle } from 'lucide-react';
 
 export default function AdminUploadPage() {
     const [password, setPassword] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [uploadedImages, setUploadedImages] = useState<{ [key: string]: string }>({});
-    const [uploadStatus, setUploadStatus] = useState<string>('');
+    const [uploadStatus, setUploadStatus] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const ADMIN_PASSWORD = 'hanana2026'; // Change this to your secret password
+    const ADMIN_PASSWORD = 'hanana2026';
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            loadPhotos();
+        }
+    }, [isAuthenticated]);
+
+    const loadPhotos = async () => {
+        try {
+            const response = await fetch('/api/photos');
+            const data = await response.json();
+            if (data.photos) {
+                setUploadedImages(data.photos);
+            }
+        } catch (err) {
+            setError('Failed to load photos');
+        }
+    };
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
         if (password === ADMIN_PASSWORD) {
             setIsAuthenticated(true);
-            // Check if images are already in localStorage
-            const stored = localStorage.getItem('valentineImages');
-            if (stored) {
-                setUploadedImages(JSON.parse(stored));
-            }
         } else {
             alert('Wrong password!');
         }
     };
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, photoKey: string) => {
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, photoKey: string) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Check if this image was already uploaded
-        const stored = localStorage.getItem('valentineImages');
-        if (stored) {
-            const existing = JSON.parse(stored);
-            if (existing[photoKey]) {
-                alert('This photo slot is already filled! To protect your privacy, you cannot change it from here. If you need to change it, clear your browser data first.');
-                return;
-            }
+        if (uploadedImages[photoKey]) {
+            alert('This photo slot is already filled! To protect your privacy, you cannot change it from here.');
+            return;
         }
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64String = reader.result as string;
+        setLoading(true);
+        setError('');
 
-            // Save to localStorage
-            const newImages = { ...uploadedImages, [photoKey]: base64String };
-            setUploadedImages(newImages);
-            localStorage.setItem('valentineImages', JSON.stringify(newImages));
+        try {
+            // Convert to base64
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+                const base64String = reader.result as string;
 
-            setUploadStatus(`${photoKey} uploaded successfully! ✅`);
-            setTimeout(() => setUploadStatus(''), 3000);
-        };
-        reader.readAsDataURL(file);
+                // Send to API
+                const response = await fetch('/api/photos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ photoKey, imageData: base64String }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    setUploadedImages(result.photos);
+                    setUploadStatus(`${photoKey} uploaded successfully! ✅`);
+                    setTimeout(() => setUploadStatus(''), 3000);
+                } else {
+                    setError(result.error || 'Upload failed');
+                }
+                setLoading(false);
+            };
+            reader.readAsDataURL(file);
+        } catch (err) {
+            setError('Upload failed');
+            setLoading(false);
+        }
     };
 
-    const allImagesUploaded = Object.keys(uploadedImages).length === 4;
+    const allImagesUploaded = Object.values(uploadedImages).filter(Boolean).length === 4;
 
     if (!isAuthenticated) {
         return (
@@ -107,13 +136,13 @@ export default function AdminUploadPage() {
                     className="bg-white/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-2xl mb-8"
                 >
                     <h1 className="text-3xl sm:text-4xl font-bold text-rose-600 mb-4 font-romantic">
-                        Upload Your Private Photos 📸
+                        Upload Your Photos 📸
                     </h1>
+
                     <div className="bg-rose-50 border-2 border-rose-200 rounded-2xl p-4 mb-6">
                         <p className="text-rose-800 font-medium">
-                            🔒 <strong>Privacy Protected:</strong> Images are stored locally in your browser only.
-                            They never leave your device or get uploaded to any server. Once uploaded, they cannot be
-                            changed from this page to protect your privacy.
+                            🔒 <strong>Privacy Protected:</strong> Images are stored in db.json on the server.
+                            Once uploaded, they cannot be changed from this page to protect your privacy.
                         </p>
                     </div>
 
@@ -124,6 +153,17 @@ export default function AdminUploadPage() {
                             className="bg-green-100 border-2 border-green-300 rounded-2xl p-4 mb-6"
                         >
                             <p className="text-green-800 font-medium">{uploadStatus}</p>
+                        </motion.div>
+                    )}
+
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-red-100 border-2 border-red-300 rounded-2xl p-4 mb-6 flex items-center gap-2"
+                        >
+                            <AlertCircle className="w-5 h-5 text-red-600" />
+                            <p className="text-red-800 font-medium">{error}</p>
                         </motion.div>
                     )}
 
@@ -162,6 +202,7 @@ export default function AdminUploadPage() {
                                                 accept="image/*"
                                                 onChange={(e) => handleImageUpload(e, photoKey)}
                                                 className="hidden"
+                                                disabled={loading}
                                             />
                                         </label>
                                     )}
@@ -178,7 +219,7 @@ export default function AdminUploadPage() {
                         >
                             <h2 className="text-2xl font-bold text-green-700 mb-2">🎉 All Photos Uploaded!</h2>
                             <p className="text-green-800 mb-4">
-                                Your private photos are ready! They will now appear on the celebration page.
+                                Your photos are saved! They will now appear on the celebration page.
                             </p>
                             <a
                                 href="/yes"
@@ -189,14 +230,13 @@ export default function AdminUploadPage() {
                         </motion.div>
                     )}
 
-                    <div className="mt-8 bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4">
-                        <h3 className="font-bold text-yellow-800 mb-2">⚠️ Important Notes:</h3>
-                        <ul className="text-yellow-800 text-sm space-y-1 list-disc list-inside">
-                            <li>Images are stored in your browser's localStorage (completely private)</li>
-                            <li>Once uploaded, you cannot change them from this page</li>
-                            <li>To change images: Clear browser data and re-upload</li>
-                            <li>Images will be lost if you clear browser data</li>
-                            <li>Recommended: Upload photos before sharing the site with Hanana</li>
+                    <div className="mt-8 bg-blue-50 border-2 border-blue-200 rounded-2xl p-4">
+                        <h3 className="font-bold text-blue-800 mb-2">ℹ️ How It Works:</h3>
+                        <ul className="text-blue-800 text-sm space-y-1 list-disc list-inside">
+                            <li>Images are stored in db.json file on the server</li>
+                            <li>Once uploaded, photos cannot be changed (privacy protection)</li>
+                            <li>Photos will persist across browser sessions</li>
+                            <li>Photos will be visible to anyone who accesses the site</li>
                         </ul>
                     </div>
                 </motion.div>
