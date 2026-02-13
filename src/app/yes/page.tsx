@@ -112,12 +112,13 @@ export default function YesPage() {
                                             transform: `rotate(${index % 2 === 0 ? '2deg' : '-2deg'})`
                                         }}
                                     >
-                                        <div className={`aspect-[4/3] rounded-xl flex items-center justify-center mb-4 overflow-hidden relative ${hasImage ? '' : `bg-gradient-to-br ${photo.gradient}`}`}>
+                                        <div className={`aspect-[4/3] rounded-xl flex items-center justify-center mb-4 overflow-hidden relative bg-gray-100 ${hasImage ? '' : `bg-gradient-to-br ${photo.gradient}`}`}>
                                             {hasImage ? (
                                                 <img
                                                     src={uploadedImages[photo.key]}
                                                     alt={photo.caption}
                                                     className="w-full h-full object-cover"
+                                                    loading="lazy"
                                                 />
                                             ) : (
                                                 <div className="text-center p-4">
