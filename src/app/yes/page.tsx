@@ -11,20 +11,30 @@ export default function YesPage() {
     const [uploadedImages, setUploadedImages] = useState<{ [key: string]: string }>({});
 
     useEffect(() => {
-        // Load images from db.json via API
-        const loadPhotos = async () => {
-            try {
-                const response = await fetch('/api/photos');
-                const data = await response.json();
-                if (data.photos) {
-                    setUploadedImages(data.photos);
-                }
-            } catch (error) {
-                console.error('Failed to load photos:', error);
-            }
+        // Load images from public folder (works on Netlify!)
+        const publicImages: { [key: string]: string } = {
+            photo1: '/photo1.jpg',
+            photo2: '/photo2.jpg',
+            photo3: '/photo3.jpg',
+            photo4: '/photo4.jpg',
         };
 
-        loadPhotos();
+        // Check which images exist and load them
+        const loadedImages: { [key: string]: string } = {};
+        Object.keys(publicImages).forEach((key) => {
+            // Try to load from public folder
+            fetch(publicImages[key])
+                .then(response => {
+                    if (response.ok) {
+                        loadedImages[key] = publicImages[key];
+                        setUploadedImages({ ...loadedImages });
+                    }
+                })
+                .catch(() => {
+                    // Image doesn't exist, that's ok
+                });
+        });
+
 
         // Launch fireworks
         const duration = 15 * 1000;
