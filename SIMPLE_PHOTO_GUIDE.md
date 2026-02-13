@@ -12,12 +12,12 @@ I've changed the code to load photos from the `public/` folder instead of `db.js
 
 1. Choose 4 photos you want to show
 2. Rename them:
-   - `photo1.jpg` (or `.png`)
-   - `photo2.jpg`
-   - `photo3.jpg`
-   - `photo4.jpg`
+   - `photo1.jpeg`
+   - `photo2.jpeg`
+   - `photo3.jpeg`
+   - `photo4.jpeg`
 
-**Important:** File names must be EXACTLY: `photo1.jpg`, `photo2.jpg`, `photo3.jpg`, `photo4.jpg`
+**Important:** File names must be EXACTLY: `photo1.jpeg`, `photo2.jpeg`, `photo3.jpeg`, `photo4.jpeg`
 
 ---
 
