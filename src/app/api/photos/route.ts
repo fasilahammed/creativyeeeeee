@@ -28,14 +28,6 @@ export async function POST(request: NextRequest) {
             db = { photos: {}, uploadedAt: null };
         }
 
-        // Check if photo already exists (privacy protection)
-        if (db.photos[photoKey]) {
-            return NextResponse.json(
-                { error: 'Photo already uploaded. Cannot change for privacy.' },
-                { status: 400 }
-            );
-        }
-
         // Update db
         db.photos[photoKey] = imageData;
         db.uploadedAt = new Date().toISOString();

@@ -45,11 +45,6 @@ export default function AdminUploadPage() {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        if (uploadedImages[photoKey]) {
-            alert('This photo slot is already filled! To protect your privacy, you cannot change it from here.');
-            return;
-        }
-
         setLoading(true);
         setError('');
 
@@ -141,8 +136,7 @@ export default function AdminUploadPage() {
 
                     <div className="bg-rose-50 border-2 border-rose-200 rounded-2xl p-4 mb-6">
                         <p className="text-rose-800 font-medium">
-                            🔒 <strong>Privacy Protected:</strong> Images are stored in db.json on the server.
-                            Once uploaded, they cannot be changed from this page to protect your privacy.
+                            📸 <strong>Admin Panel:</strong> Upload or replace photos anytime. Hover over uploaded photos to see the replace option.
                         </p>
                     </div>
 
@@ -179,7 +173,7 @@ export default function AdminUploadPage() {
                                     </h3>
 
                                     {isUploaded ? (
-                                        <div className="relative">
+                                        <div className="relative group">
                                             <img
                                                 src={uploadedImages[photoKey]}
                                                 alt={captions[index]}
@@ -188,7 +182,19 @@ export default function AdminUploadPage() {
                                             <div className="absolute top-2 right-2 bg-green-500 rounded-full p-2">
                                                 <Check className="w-5 h-5 text-white" />
                                             </div>
-                                            <p className="text-green-600 font-medium text-sm mt-2">✅ Uploaded & Protected</p>
+                                            <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer rounded-xl">
+                                                <div className="text-center">
+                                                    <Upload className="w-12 h-12 text-white mb-2 mx-auto" />
+                                                    <p className="text-white font-bold">Click to Replace</p>
+                                                </div>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={(e) => handleImageUpload(e, photoKey)}
+                                                    className="hidden"
+                                                    disabled={loading}
+                                                />
+                                            </label>
                                         </div>
                                     ) : (
                                         <label className="block cursor-pointer">
@@ -234,7 +240,7 @@ export default function AdminUploadPage() {
                         <h3 className="font-bold text-blue-800 mb-2">ℹ️ How It Works:</h3>
                         <ul className="text-blue-800 text-sm space-y-1 list-disc list-inside">
                             <li>Images are stored in db.json file on the server</li>
-                            <li>Once uploaded, photos cannot be changed (privacy protection)</li>
+                            <li>You can replace photos anytime - just hover and click</li>
                             <li>Photos will persist across browser sessions</li>
                             <li>Photos will be visible to anyone who accesses the site</li>
                         </ul>
