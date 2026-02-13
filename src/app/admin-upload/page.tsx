@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Upload, Check, Lock, AlertCircle } from 'lucide-react';
+import ImageCropper from '@/components/ImageCropper';
 
 export default function AdminUploadPage() {
     const [password, setPassword] = useState('');
@@ -11,6 +12,8 @@ export default function AdminUploadPage() {
     const [uploadStatus, setUploadStatus] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+    const [currentPhotoKey, setCurrentPhotoKey] = useState<string | null>(null);
 
     const ADMIN_PASSWORD = 'hanana2026';
 
@@ -41,42 +44,54 @@ export default function AdminUploadPage() {
         }
     };
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, photoKey: string) => {
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>, photoKey: string) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // Read file and show cropper
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setPreviewImage(reader.result as string);
+            setCurrentPhotoKey(photoKey);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleCropComplete = async (croppedImage: string) => {
+        if (!currentPhotoKey) return;
+
         setLoading(true);
         setError('');
+        setPreviewImage(null);
 
         try {
-            // Convert to base64
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                const base64String = reader.result as string;
+            // Send to API
+            const response = await fetch('/api/photos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ photoKey: currentPhotoKey, imageData: croppedImage }),
+            });
 
-                // Send to API
-                const response = await fetch('/api/photos', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ photoKey, imageData: base64String }),
-                });
+            const result = await response.json();
 
-                const result = await response.json();
-
-                if (response.ok) {
-                    setUploadedImages(result.photos);
-                    setUploadStatus(`${photoKey} uploaded successfully! ✅`);
-                    setTimeout(() => setUploadStatus(''), 3000);
-                } else {
-                    setError(result.error || 'Upload failed');
-                }
-                setLoading(false);
-            };
-            reader.readAsDataURL(file);
+            if (response.ok) {
+                setUploadedImages(result.photos);
+                setUploadStatus(`${currentPhotoKey} uploaded successfully! ✅`);
+                setTimeout(() => setUploadStatus(''), 3000);
+            } else {
+                setError(result.error || 'Upload failed');
+            }
         } catch (err) {
             setError('Upload failed');
+        } finally {
             setLoading(false);
+            setCurrentPhotoKey(null);
         }
+    };
+
+    const handleCropCancel = () => {
+        setPreviewImage(null);
+        setCurrentPhotoKey(null);
     };
 
     const allImagesUploaded = Object.values(uploadedImages).filter(Boolean).length === 4;
@@ -190,7 +205,7 @@ export default function AdminUploadPage() {
                                                 <input
                                                     type="file"
                                                     accept="image/*"
-                                                    onChange={(e) => handleImageUpload(e, photoKey)}
+                                                    onChange={(e) => handleImageSelect(e, photoKey)}
                                                     className="hidden"
                                                     disabled={loading}
                                                 />
@@ -206,7 +221,7 @@ export default function AdminUploadPage() {
                                             <input
                                                 type="file"
                                                 accept="image/*"
-                                                onChange={(e) => handleImageUpload(e, photoKey)}
+                                                onChange={(e) => handleImageSelect(e, photoKey)}
                                                 className="hidden"
                                                 disabled={loading}
                                             />
@@ -247,6 +262,15 @@ export default function AdminUploadPage() {
                     </div>
                 </motion.div>
             </div>
+
+            {/* Image Cropper Modal */}
+            {previewImage && (
+                <ImageCropper
+                    image={previewImage}
+                    onCropComplete={handleCropComplete}
+                    onCancel={handleCropCancel}
+                />
+            )}
         </div>
     );
 }
