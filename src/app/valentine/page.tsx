@@ -8,7 +8,6 @@ import FloatingHearts from '@/components/FloatingHearts';
 export default function ValentinePage() {
     const [noBtnPosition, setNoBtnPosition] = useState({ x: 0, y: 0 });
     const [noAttempts, setNoAttempts] = useState(0);
-    const [canClickYes, setCanClickYes] = useState(false);
 
     const moveNoButton = () => {
         // Mobile-friendly random movement
@@ -17,11 +16,6 @@ export default function ValentinePage() {
         const y = (Math.random() - 0.5) * maxMove;
         setNoBtnPosition({ x, y });
         setNoAttempts(prev => prev + 1);
-
-        // Enable YES button after 2 attempts
-        if (noAttempts >= 1) {
-            setCanClickYes(true);
-        }
     };
 
     return (
@@ -40,7 +34,7 @@ export default function ValentinePage() {
                         animate={{ scale: [1, 1.02, 1] }}
                         transition={{ duration: 2, repeat: Infinity }}
                     >
-                        kunjaa.. Will you be my Valentine? 💝
+                        Will you be my Valentine? 💝
                     </motion.h1>
 
                     <motion.p
@@ -51,46 +45,35 @@ export default function ValentinePage() {
                     >
                         You make my world brighter every day...
                     </motion.p>
-
-
                 </motion.div>
 
-                {/* Buttons Container - Fixed positioning for mobile */}
+                {/* Buttons Container */}
                 <div className="relative flex flex-col items-center gap-6 sm:gap-8 min-h-[280px] sm:min-h-[300px]">
 
-                    {/* YES Button */}
+                    {/* YES Button - Always Active */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.8 }}
                         className="w-full sm:w-auto z-20"
                     >
-                        {canClickYes ? (
-                            <Link href="/yes" className="block w-full sm:w-auto">
-                                <motion.button
-                                    whileTap={{ scale: 0.92 }}
-                                    className="w-full sm:w-auto px-12 py-5 sm:py-6 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-full text-xl sm:text-2xl md:text-3xl font-bold shadow-2xl active:shadow-lg transition-all touch-manipulation"
-                                >
-                                    <motion.span
-                                        animate={{ rotate: [0, -5, 5, 0] }}
-                                        transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1.5 }}
-                                        className="inline-block"
-                                    >
-                                        YES! 💖
-                                    </motion.span>
-                                </motion.button>
-                            </Link>
-                        ) : (
+                        <Link href="/yes" className="block w-full sm:w-auto">
                             <motion.button
-                                onClick={() => alert("Try clicking 'No' at least 2 times first! 😉")}
-                                className="w-full sm:w-auto px-12 py-5 sm:py-6 bg-gray-400 text-gray-200 rounded-full text-xl sm:text-2xl md:text-3xl font-bold shadow-xl cursor-not-allowed opacity-60"
+                                whileTap={{ scale: 0.92 }}
+                                className="w-full sm:w-auto px-12 py-5 sm:py-6 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-full text-xl sm:text-2xl md:text-3xl font-bold shadow-2xl active:shadow-lg transition-all touch-manipulation"
                             >
-                                YES! 💖
+                                <motion.span
+                                    animate={{ rotate: [0, -5, 5, 0] }}
+                                    transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1.5 }}
+                                    className="inline-block"
+                                >
+                                    YES! 💖
+                                </motion.span>
                             </motion.button>
-                        )}
+                        </Link>
                     </motion.div>
 
-                    {/* NO Button - Mobile Fixed */}
+                    {/* NO Button */}
                     <motion.button
                         initial={{ opacity: 0, y: 20 }}
                         animate={{
@@ -123,22 +106,6 @@ export default function ValentinePage() {
                             <p className="text-rose-600 font-medium text-base sm:text-lg">
                                 (Nayeekutyee ink ariyaa iyj noo nekum nn noki irinaalum madhi..😏)
                             </p>
-                        </motion.div>
-                    )}
-
-                    {canClickYes && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="mt-4 sm:mt-8 bg-gradient-to-r from-rose-100 to-pink-100 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border-2 border-rose-300"
-                        >
-                            <motion.p
-                                animate={{ scale: [1, 1.05, 1] }}
-                                transition={{ duration: 1, repeat: Infinity }}
-                                className="text-rose-600 font-bold text-lg sm:text-xl"
-                            >
-                                Now you can click "YES!" 💕✨
-                            </motion.p>
                         </motion.div>
                     )}
                 </AnimatePresence>
