@@ -7,7 +7,6 @@ import FloatingHearts from '@/components/FloatingHearts';
 
 export default function ValentinePage() {
     const [noBtnPosition, setNoBtnPosition] = useState({ x: 0, y: 0 });
-    const [yesSize, setYesSize] = useState(1);
     const [noAttempts, setNoAttempts] = useState(0);
     const [canClickYes, setCanClickYes] = useState(false);
 
@@ -17,7 +16,6 @@ export default function ValentinePage() {
         const x = (Math.random() - 0.5) * maxMove;
         const y = (Math.random() - 0.5) * maxMove;
         setNoBtnPosition({ x, y });
-        setYesSize(prev => Math.min(prev + 0.2, 2.5));
         setNoAttempts(prev => prev + 1);
 
         // Enable YES button after 2 attempts
@@ -42,7 +40,7 @@ export default function ValentinePage() {
                         animate={{ scale: [1, 1.02, 1] }}
                         transition={{ duration: 2, repeat: Infinity }}
                     >
-                        Will you be my Valentine? 💝
+                        kunjaa.. Will you be my Valentine? 💝
                     </motion.h1>
 
                     <motion.p
@@ -54,16 +52,7 @@ export default function ValentinePage() {
                         You make my world brighter every day...
                     </motion.p>
 
-                    {!canClickYes && (
-                        <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 1 }}
-                            className="text-sm sm:text-base text-rose-500 italic"
-                        >
-                            (Try clicking "No" first... if you dare 😏)
-                        </motion.p>
-                    )}
+
                 </motion.div>
 
                 {/* Buttons Container - Fixed positioning for mobile */}
@@ -80,7 +69,6 @@ export default function ValentinePage() {
                             <Link href="/yes" className="block w-full sm:w-auto">
                                 <motion.button
                                     whileTap={{ scale: 0.92 }}
-                                    style={{ scale: yesSize }}
                                     className="w-full sm:w-auto px-12 py-5 sm:py-6 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-full text-xl sm:text-2xl md:text-3xl font-bold shadow-2xl active:shadow-lg transition-all touch-manipulation"
                                 >
                                     <motion.span
@@ -95,7 +83,6 @@ export default function ValentinePage() {
                         ) : (
                             <motion.button
                                 onClick={() => alert("Try clicking 'No' at least 2 times first! 😉")}
-                                style={{ scale: yesSize }}
                                 className="w-full sm:w-auto px-12 py-5 sm:py-6 bg-gray-400 text-gray-200 rounded-full text-xl sm:text-2xl md:text-3xl font-bold shadow-xl cursor-not-allowed opacity-60"
                             >
                                 YES! 💖
@@ -126,7 +113,7 @@ export default function ValentinePage() {
 
                 {/* Hints */}
                 <AnimatePresence>
-                    {noAttempts > 0 && noAttempts < 2 && (
+                    {noAttempts > 0 && (
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -134,7 +121,7 @@ export default function ValentinePage() {
                             className="mt-8 sm:mt-12 bg-white/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-rose-200"
                         >
                             <p className="text-rose-600 font-medium text-base sm:text-lg">
-                                Click "No" one more time to unlock the "YES" button! 😊
+                                (Nayeekutyee ink ariyaa iyj noo nekum nn noki irinaalum madhi..😏)
                             </p>
                         </motion.div>
                     )}
@@ -143,7 +130,7 @@ export default function ValentinePage() {
                         <motion.div
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="mt-8 sm:mt-12 bg-gradient-to-r from-rose-100 to-pink-100 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border-2 border-rose-300"
+                            className="mt-4 sm:mt-8 bg-gradient-to-r from-rose-100 to-pink-100 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border-2 border-rose-300"
                         >
                             <motion.p
                                 animate={{ scale: [1, 1.05, 1] }}
@@ -152,18 +139,6 @@ export default function ValentinePage() {
                             >
                                 Now you can click "YES!" 💕✨
                             </motion.p>
-                        </motion.div>
-                    )}
-
-                    {noAttempts > 5 && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="mt-4 bg-white/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-rose-200"
-                        >
-                            <p className="text-rose-600 font-medium text-base sm:text-lg">
-                                Still trying? You know you want to say yes! 😘
-                            </p>
                         </motion.div>
                     )}
                 </AnimatePresence>
